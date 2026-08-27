@@ -289,6 +289,122 @@ func FloatFinite() Rule
 func FloatNotFinite() Rule
 ```
 
+## Byte rules
+
+Byte rules accept slices and arrays whose element type has `uint8` as its
+underlying kind, including `[]byte`, `[N]byte`, and user-defined byte types.
+
+### Type, nil, and emptiness
+
+```go
+func Bytes() Rule
+func BytesNil() Rule
+func BytesNotNil() Rule
+func BytesEmpty() Rule
+func BytesNotEmpty() Rule
+```
+
+Only slices can be nil. Byte arrays always pass `BytesNotNil` and fail
+`BytesNil`.
+
+### Length
+
+```go
+func BytesLength(expect int) Rule
+func BytesMinLength(expect int) Rule
+func BytesMaxLength(expect int) Rule
+func BytesLengthBetween(minimum, maximum int) Rule
+func BytesLengthNotBetween(minimum, maximum int) Rule
+```
+
+Negative lengths and reversed ranges produce validation errors.
+
+### Equality and sets
+
+```go
+func BytesEqual(expected []byte) Rule
+func BytesNotEqual(unexpected []byte) Rule
+func BytesConstantTimeEqual(expected []byte) Rule
+func BytesOneOf(expected ...[]byte) Rule
+func BytesNoneOf(unexpected ...[]byte) Rule
+```
+
+Expected byte slices are cloned when the rule is created, so later mutations
+by the caller do not alter rule behavior. `BytesConstantTimeEqual` uses
+constant-time content comparison.
+
+### Contents, prefixes, and suffixes
+
+```go
+func BytesContains(expected []byte) Rule
+func BytesNotContains(unexpected []byte) Rule
+func BytesContainsAny(expected ...[]byte) Rule
+func BytesContainsAll(expected ...[]byte) Rule
+func BytesHasPrefix(prefix []byte) Rule
+func BytesNotHasPrefix(prefix []byte) Rule
+func BytesHasSuffix(suffix []byte) Rule
+func BytesNotHasSuffix(suffix []byte) Rule
+```
+
+Containment refers to byte subsequences rather than individual elements.
+
+### Lexicographical comparison
+
+```go
+func BytesGreaterThan(expected []byte) Rule
+func BytesGreaterThanOrEqual(expected []byte) Rule
+func BytesLessThan(expected []byte) Rule
+func BytesLessThanOrEqual(expected []byte) Rule
+func BytesBetween(minimum, maximum []byte) Rule
+```
+
+These rules use lexicographical byte ordering.
+
+### Byte state and text content
+
+```go
+func BytesNoZero() Rule
+func BytesHasZero() Rule
+func BytesAllZero() Rule
+func BytesNotAllZero() Rule
+func BytesUnique() Rule
+func BytesASCII() Rule
+func BytesPrintableASCII() Rule
+func BytesUTF8() Rule
+func BytesNotUTF8() Rule
+```
+
+`BytesPrintableASCII` accepts bytes from 32 through 126 inclusive.
+
+### Encoded and document formats
+
+```go
+func BytesJSON() Rule
+func BytesXML() Rule
+func BytesPEM() Rule
+func BytesHex() Rule
+func BytesBase64() Rule
+func BytesBase64URL() Rule
+```
+
+Hexadecimal and Base64 rules validate encoded textual bytes; they do not
+inspect already-decoded binary data.
+
+### Per-byte validation
+
+```go
+func BytesEach(rules ...Rule) Rule
+func BytesAt(index int, rules ...Rule) Rule
+func BytesAtIfPresent(index int, rules ...Rule) Rule
+```
+
+Each selected byte is supplied to nested rules as a `uint8` value, so integer
+rules can be reused:
+
+```go
+govalid.BytesEach(govalid.IntBetween(uint8(0), uint8(127)))
+```
+
 ## Map rules
 
 ### Type, nil, and emptiness
