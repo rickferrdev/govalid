@@ -3,7 +3,7 @@
 [Página inicial](../README.md) · [English](README.en.md) · [Referência completa da API](API.md)
 
 `govalid` oferece regras combináveis para validar campos selecionados de
-structs Go sem utilizar tags. O escopo da v0.1.0 inclui booleanos, strings,
+structs Go sem utilizar tags. O escopo da v0.2.0-alpha.1 inclui booleanos, strings,
 inteiros, floats, maps, collections e sequências de bytes.
 
 > Este é um projeto pre-v1. Nomes públicos e comportamentos ainda podem mudar
@@ -12,7 +12,7 @@ inteiros, floats, maps, collections e sequências de bytes.
 ## Instalação
 
 ```bash
-go get github.com/rickferrdev/govalid@v0.1.0
+go get github.com/rickferrdev/govalid@v0.2.0-alpha.1
 ```
 
 Utilize o caminho do módulo sem versão para instalar a revisão atual de
@@ -130,7 +130,7 @@ usuário. Elas cobrem:
 - conteúdo JSON, XML, PEM, hexadecimal, Base64 e Base64URL;
 - regras aplicadas a cada byte ou a um índice específico.
 
-## Limitações da v0.1.0
+## Limitações da v0.2.0-alpha.1
 
 - Ainda não existem regras recursivas `Struct*`; caminhos aninhados funcionam.
 - Ainda não existem regras específicas para tempo, duração, ponteiros ou

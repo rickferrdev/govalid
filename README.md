@@ -10,7 +10,7 @@ Composable validation rules for Go structs.
 values that can be combined per field, including nested struct paths, map keys
 and values, and collection items.
 
-> Current target: **v0.1.0**. The project is pre-v1 and its public API may still
+> Current target: **v0.2.0-alpha.1**. The project is pre-v1 and its public API may still
 > change. Dedicated nested-struct rules are not included yet.
 
 ## Documentation
@@ -23,10 +23,10 @@ Choose a language for the project overview, or open the complete API catalog:
 
 ## Install
 
-After the v0.1.0 tag is published:
+After the v0.2.0-alpha.1 tag is published:
 
 ```bash
-go get github.com/rickferrdev/govalid@v0.1.0
+go get github.com/rickferrdev/govalid@v0.2.0-alpha.1
 ```
 
 For the current development version:
@@ -86,7 +86,7 @@ func main() {
 }
 ```
 
-## Included in v0.1.0
+## Included in v0.2.0-alpha.1
 
 - Boolean rules: true, false, and equality.
 - String rules: presence, Unicode-aware length, content, case, regex, email,

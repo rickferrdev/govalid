@@ -3,7 +3,7 @@
 [Project home](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Complete API reference](API.md)
 
 `govalid` provides composable rules for validating selected Go struct fields
-without tags. The v0.1.0 scope includes booleans, strings, integers, floats,
+without tags. The v0.2.0-alpha.1 scope includes booleans, strings, integers, floats,
 maps, collections, and byte sequences.
 
 > This is a pre-v1 project. Public names and behavior may still change before
@@ -12,7 +12,7 @@ maps, collections, and byte sequences.
 ## Installation
 
 ```bash
-go get github.com/rickferrdev/govalid@v0.1.0
+go get github.com/rickferrdev/govalid@v0.2.0-alpha.1
 ```
 
 Use the module path without a version to install the current development
@@ -129,7 +129,7 @@ cover:
 - JSON, XML, PEM, hexadecimal, Base64, and Base64URL content;
 - rules applied to every byte or a selected index.
 
-## v0.1.0 limitations
+## v0.2.0-alpha.1 limitations
 
 - No recursive `Struct*` rules yet; nested field paths are supported.
 - No dedicated rules for time, duration, pointers, or universal presence yet.
