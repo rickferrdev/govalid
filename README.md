@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/govalid-gopher.png" alt="govalid gopher mascot holding a validation checklist" width="220">
+</p>
+
 # govalid
 
 Composable validation rules for Go structs.
