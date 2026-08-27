@@ -11,7 +11,7 @@ values that can be combined per field, including nested struct paths, map keys
 and values, and collection items.
 
 > Current target: **v0.1.0**. The project is pre-v1 and its public API may still
-> change. Dedicated byte and nested-struct rules are not included yet.
+> change. Dedicated nested-struct rules are not included yet.
 
 ## Documentation
 
@@ -98,6 +98,8 @@ func main() {
 - Map rules: nil/empty, length, keys, values, nested rules, and comparisons.
 - Collection rules: slices and arrays, length, contents, uniqueness, nested
   rules, and comparisons.
+- Byte rules: byte slices and arrays, length, binary content, encodings,
+  document formats, and per-byte validation.
 - Nested field lookup using paths such as `"Profile.Email"`.
 - Collection of every issue, or early exit with `WithStopOnFirstError()`.
 
@@ -108,8 +110,8 @@ func main() {
 - `Collection` rules support slices and arrays. Only slices can be nil.
 - Integer rules accept `int`, all `intN`/`uintN` variants, `uint`, `uintptr`,
   and user-defined types with those underlying types.
-- Dedicated rules for `[]byte`, arbitrary nested struct validation, time,
-  duration, and universal presence are planned beyond the initial scope.
+- Dedicated rules for arbitrary nested struct validation, time, duration, and
+  universal presence are planned beyond the initial scope.
 
 ## Development
 

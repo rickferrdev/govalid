@@ -4,7 +4,7 @@
 
 `govalid` oferece regras combináveis para validar campos selecionados de
 structs Go sem utilizar tags. O escopo da v0.1.0 inclui booleanos, strings,
-inteiros, floats, maps, slices e arrays.
+inteiros, floats, maps, collections e sequências de bytes.
 
 > Este é um projeto pre-v1. Nomes públicos e comportamentos ainda podem mudar
 > antes da estabilização da API.
@@ -118,10 +118,20 @@ As regras de collection aceitam slices e arrays. Elas cobrem:
 
 Arrays nunca são nil; somente slices podem satisfazer `CollectionNil`.
 
+### Bytes
+
+As regras de bytes aceitam slices, arrays e tipos de byte definidos pelo
+usuário. Elas cobrem:
+
+- nil, vazio e comprimento;
+- igualdade, igualdade em tempo constante, conteúdo, prefixos e sufixos;
+- comparação lexicográfica e intervalos;
+- bytes zero, unicidade, ASCII, ASCII imprimível e UTF-8;
+- conteúdo JSON, XML, PEM, hexadecimal, Base64 e Base64URL;
+- regras aplicadas a cada byte ou a um índice específico.
+
 ## Limitações da v0.1.0
 
-- Ainda não existem regras dedicadas `Bytes*`; `[]byte` pode usar apenas regras
-  de collection.
 - Ainda não existem regras recursivas `Struct*`; caminhos aninhados funcionam.
 - Ainda não existem regras específicas para tempo, duração, ponteiros ou
   presença universal.

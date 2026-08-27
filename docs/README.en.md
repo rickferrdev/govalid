@@ -4,7 +4,7 @@
 
 `govalid` provides composable rules for validating selected Go struct fields
 without tags. The v0.1.0 scope includes booleans, strings, integers, floats,
-maps, slices, and arrays.
+maps, collections, and byte sequences.
 
 > This is a pre-v1 project. Public names and behavior may still change before
 > API stabilization.
@@ -117,9 +117,20 @@ Collection rules support slices and arrays. They cover:
 
 Arrays are never nil; only slices can satisfy `CollectionNil`.
 
+### Bytes
+
+Byte rules support byte slices, byte arrays, and user-defined byte types. They
+cover:
+
+- nil, empty, and length checks;
+- equality, constant-time equality, containment, prefixes, and suffixes;
+- lexicographical comparisons and ranges;
+- zero bytes, uniqueness, ASCII, printable ASCII, and UTF-8;
+- JSON, XML, PEM, hexadecimal, Base64, and Base64URL content;
+- rules applied to every byte or a selected index.
+
 ## v0.1.0 limitations
 
-- No dedicated `Bytes*` rules yet; `[]byte` can only use collection rules.
 - No recursive `Struct*` rules yet; nested field paths are supported.
 - No dedicated rules for time, duration, pointers, or universal presence yet.
 - Map iteration order is unspecified, so the first nested map failure may vary.
