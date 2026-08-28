@@ -6,6 +6,7 @@ import (
 	"reflect"
 )
 
+// CollectionContains returns a collection validation rule for contains.
 func CollectionContains[T any](expected T) Rule {
 	return collectionRule(func(value reflect.Value) error {
 		if collectionContains(value, expected) {
@@ -15,6 +16,7 @@ func CollectionContains[T any](expected T) Rule {
 	})
 }
 
+// CollectionNotContains returns a collection validation rule for not contains.
 func CollectionNotContains[T any](unexpected T) Rule {
 	return collectionRule(func(value reflect.Value) error {
 		if collectionContains(value, unexpected) {
@@ -24,6 +26,7 @@ func CollectionNotContains[T any](unexpected T) Rule {
 	})
 }
 
+// CollectionContainsAny returns a collection validation rule for contains any.
 func CollectionContainsAny[T any](expected ...T) Rule {
 	return collectionRule(func(value reflect.Value) error {
 		for _, expectedItem := range expected {
@@ -35,6 +38,7 @@ func CollectionContainsAny[T any](expected ...T) Rule {
 	})
 }
 
+// CollectionContainsAll returns a collection validation rule for contains all.
 func CollectionContainsAll[T any](expected ...T) Rule {
 	return collectionRule(func(value reflect.Value) error {
 		for _, expectedItem := range expected {
@@ -46,6 +50,7 @@ func CollectionContainsAll[T any](expected ...T) Rule {
 	})
 }
 
+// CollectionUnique returns a collection validation rule for unique.
 func CollectionUnique() Rule {
 	return collectionRule(func(value reflect.Value) error {
 		for left := 0; left < value.Len(); left++ {
@@ -59,6 +64,7 @@ func CollectionUnique() Rule {
 	})
 }
 
+// CollectionNoNilItems returns a collection validation rule for no nil items.
 func CollectionNoNilItems() Rule {
 	return collectionRule(func(value reflect.Value) error {
 		for index := 0; index < value.Len(); index++ {
@@ -70,6 +76,7 @@ func CollectionNoNilItems() Rule {
 	})
 }
 
+// CollectionNoZeroItems returns a collection validation rule for no zero items.
 func CollectionNoZeroItems() Rule {
 	return collectionRule(func(value reflect.Value) error {
 		for index := 0; index < value.Len(); index++ {
@@ -82,6 +89,7 @@ func CollectionNoZeroItems() Rule {
 	})
 }
 
+// CollectionHasNonZeroItem returns a collection validation rule for has non zero item.
 func CollectionHasNonZeroItem() Rule {
 	return collectionRule(func(value reflect.Value) error {
 		for index := 0; index < value.Len(); index++ {

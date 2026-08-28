@@ -1,40 +1,85 @@
-# govalid
+# govalid · Visão geral em português
 
-[Página inicial](../README.md) · [English](README.en.md) · [Referência completa da API](API.md)
+[← Página inicial](../README.md) · [English](README.en.md) · [Referência da API](API.md)
 
-`govalid` oferece regras combináveis para validar campos selecionados de
-structs Go sem utilizar tags. O escopo da v0.2.0-alpha.1 inclui booleanos, strings,
-inteiros, floats, maps, collections e sequências de bytes.
+> Validação explícita e combinável para campos selecionados de structs Go.
 
-> Este é um projeto pre-v1. Nomes públicos e comportamentos ainda podem mudar
-> antes da estabilização da API.
-
-## Instalação
+## Comece aqui
 
 ```bash
-go get github.com/rickferrdev/govalid@v0.2.0-alpha.1
+go get github.com/rickferrdev/govalid@latest
 ```
-
-Utilize o caminho do módulo sem versão para instalar a revisão atual de
-desenvolvimento.
-
-## Uso básico
 
 ```go
 validator := govalid.New()
 
 err := validator.Validate(
 	user,
-	govalid.Field("Name", govalid.StringRequired(), govalid.StringMinLength(3)),
+	govalid.Field("Name", govalid.Required(), govalid.StringMinLength(3)),
 	govalid.Field("Age", govalid.IntBetween(18, 130)),
-	govalid.Field("Active", govalid.BoolTrue()),
+	govalid.FieldIfPresent("Profile.Email", govalid.StringEmail()),
 	govalid.Field("Scores", govalid.CollectionEach(govalid.IntBetween(0, 100))),
 )
 ```
 
-Campos de structs aninhadas podem ser acessados por caminhos como
-`"Profile.Email"`. Por padrão, todas as falhas são coletadas. Utilize
-`New(WithStopOnFirstError())` para encerrar no primeiro problema.
+O modelo é propositalmente pequeno:
+
+1. Crie ou reutilize um `Validator`.
+2. Associe caminhos e regras com `Field` ou `FieldIfPresent`.
+3. Inspecione os erros estruturados retornados.
+
+## O que está incluído
+
+| Família | Cobertura |
+| --- | --- |
+| Boolean | Estado e igualdade |
+| String | Comprimento Unicode, conteúdo, caixa, regex, email, URL e UUID |
+| Integer | Comparações signed/unsigned, conjuntos, aritmética e domínios |
+| Float | Comparações, tolerância, representação e valores especiais |
+| Bytes | Conteúdo binário, encodings, documentos e regras por byte |
+| Map | Chaves, valores, comprimento, relações e regras aninhadas |
+| Collection | Conteúdo, comprimento, unicidade, comparação e itens aninhados |
+| Universal | Presença, nil e zero value |
+| Condicional | Condições booleanas, contexto e valores opcionais |
+
+Tipos definidos pelo usuário são aceitos quando possuem um tipo subjacente
+suportado. Comparações entre inteiros signed e unsigned preservam todo o
+intervalo de `uint64`.
+
+## Padrões de composição
+
+Valide todas as chaves e valores de um map:
+
+```go
+govalid.Field(
+	"Labels",
+	govalid.MapKeys(govalid.StringLowercase()),
+	govalid.MapValues(govalid.StringRequired()),
+)
+```
+
+Ignore regras aninhadas quando o valor estiver ausente:
+
+```go
+govalid.Field(
+	"Scores",
+	govalid.Optional(
+		govalid.CollectionEach(govalid.IntBetween(0, 100)),
+	),
+)
+```
+
+Aplique regras com base na struct raiz:
+
+```go
+govalid.WhenContext(func(ctx govalid.RuleContext) bool {
+	return ctx.RootAny().(Account).Enabled
+}, govalid.StringRequired())
+```
+
+## Erros estruturados
+
+Por padrão, todas as falhas são retornadas em `*FieldIssueError`:
 
 ```go
 var validationErr *govalid.FieldIssueError
@@ -46,97 +91,36 @@ if errors.As(err, &validationErr) {
 }
 ```
 
-## Resumo das regras
+Cada `Issue` expõe `Path`, o `Value` rejeitado, `Rule` e `Message`. Use
+`WithStopOnFirstError`, `WithPanicOnFirstError` ou `WithSilenceErrors` para
+alterar a execução. `WithIssueHandler` observa falhas independentemente do
+comportamento escolhido para o retorno.
 
-### Boolean
+## Extensibilidade
 
-`BoolTrue`, `BoolFalse` e `BoolEqual` validam estado e igualdade de booleanos.
+- Implemente regras personalizadas com `Rule` e `RuleContext`.
+- Use `FieldIfPresent` quando um ponteiro ou interface aninhada puder ser nil.
+- Implemente `FieldSource` para descobrir `FieldSpec` em outro formato.
+- Reutilize um validator concorrentemente quando callbacks e sources forem
+  concurrency-safe.
 
-### String
+`FieldSource` é a fronteira de compatibilidade para futuras integrações com
+tags, schemas ou código gerado. Nenhuma sintaxe de tags embutida faz parte do
+escopo inicial da v1.
 
-As regras de string cobrem:
+## Escopo da v1
 
-- valor obrigatório e comprimento baseado em runas Unicode;
-- conteúdo alfabético, numérico, alfanumérico e ASCII;
-- texto em minúsculas, maiúsculas ou sem espaços externos;
-- prefixos, sufixos, conteúdo e conjuntos permitidos;
-- regex, email, URL absoluta e UUID.
+A API estável inicial foca em regras explícitas para valores primitivos, maps,
+collections, bytes, caminhos aninhados, composição condicional e erros
+estruturados. Regras recursivas `Struct*`, famílias de tempo/duração e um parser
+de tags embutido podem evoluir em releases posteriores.
 
-Regras somente de formato aceitam string vazia. Combine-as com
-`StringRequired` quando o campo for obrigatório.
+Maps não possuem ordem de iteração garantida, portanto a primeira falha
+aninhada pode variar. Regras de string somente de formato aceitam valor vazio;
+combine-as com `Required` ou `StringRequired` quando a presença for obrigatória.
 
-### Integer
+## Próximos links
 
-As regras de inteiros aceitam todos os tipos assinados e não assinados,
-`uintptr` e tipos definidos pelo usuário. Elas cobrem:
-
-- comparação, igualdade, intervalos inclusivos e conjuntos;
-- valores positivos, negativos e zero;
-- paridade, divisibilidade, primos, compostos, potências de dois e quadrados
-  perfeitos;
-- portas, porcentagens e status HTTP.
-
-Comparações mistas entre signed e unsigned preservam todo o intervalo de
-`uint64`.
-
-### Float
-
-As regras de float aceitam `float32`, `float64` e tipos derivados. Elas cobrem:
-
-- comparação, igualdade, intervalos e tolerância;
-- sinal e estados de zero;
-- representação de 32 e 64 bits;
-- `NaN`, infinito positivo/negativo e finitude.
-
-### Map
-
-As regras de map cobrem:
-
-- nil, vazio e comprimento;
-- chaves obrigatórias, proibidas, permitidas ou exatas;
-- presença de valores e valores zero/nil;
-- regras aplicadas a cada chave, cada valor ou uma chave selecionada;
-- igualdade, subset e superset.
-
-```go
-govalid.Field(
-	"Labels",
-	govalid.MapNotEmpty(),
-	govalid.MapKeys(govalid.StringLowercase()),
-	govalid.MapValues(govalid.StringRequired()),
-)
-```
-
-### Collection
-
-As regras de collection aceitam slices e arrays. Elas cobrem:
-
-- nil, vazio e comprimento;
-- presença, unicidade, valores zero e nil;
-- igualdade e diferença;
-- regras aplicadas a todos, qualquer, nenhum ou um índice específico.
-
-Arrays nunca são nil; somente slices podem satisfazer `CollectionNil`.
-
-### Bytes
-
-As regras de bytes aceitam slices, arrays e tipos de byte definidos pelo
-usuário. Elas cobrem:
-
-- nil, vazio e comprimento;
-- igualdade, igualdade em tempo constante, conteúdo, prefixos e sufixos;
-- comparação lexicográfica e intervalos;
-- bytes zero, unicidade, ASCII, ASCII imprimível e UTF-8;
-- conteúdo JSON, XML, PEM, hexadecimal, Base64 e Base64URL;
-- regras aplicadas a cada byte ou a um índice específico.
-
-## Limitações da v0.2.0-alpha.1
-
-- Ainda não existem regras recursivas `Struct*`; caminhos aninhados funcionam.
-- Ainda não existem regras específicas para tempo, duração, ponteiros ou
-  presença universal.
-- Maps não possuem ordem de iteração garantida; a primeira falha aninhada pode
-  variar.
-
-Para consultar todas as assinaturas e aliases legados, veja a
-[referência completa da API](API.md), escrita em inglês.
+- [Referência completa da API](API.md)
+- [README principal e exemplo completo](../README.md)
+- [Documentação do pacote](https://pkg.go.dev/github.com/rickferrdev/govalid)

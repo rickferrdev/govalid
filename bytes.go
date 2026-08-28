@@ -5,10 +5,12 @@ import (
 	"reflect"
 )
 
+// Bytes requires a byte slice or byte array, including defined byte types.
 func Bytes() Rule {
 	return bytesRule(func(reflect.Value) error { return nil })
 }
 
+// BytesNil returns a byte-sequence validation rule for nil.
 func BytesNil() Rule {
 	return bytesRule(func(value reflect.Value) error {
 		if value.Kind() != reflect.Slice || !value.IsNil() {
@@ -18,6 +20,7 @@ func BytesNil() Rule {
 	})
 }
 
+// BytesNotNil returns a byte-sequence validation rule for not nil.
 func BytesNotNil() Rule {
 	return bytesRule(func(value reflect.Value) error {
 		if value.Kind() == reflect.Slice && value.IsNil() {
@@ -27,6 +30,7 @@ func BytesNotNil() Rule {
 	})
 }
 
+// BytesEmpty returns a byte-sequence validation rule for empty.
 func BytesEmpty() Rule {
 	return bytesPredicateRule(
 		func(value reflect.Value) bool { return value.Len() == 0 },
@@ -34,6 +38,7 @@ func BytesEmpty() Rule {
 	)
 }
 
+// BytesNotEmpty returns a byte-sequence validation rule for not empty.
 func BytesNotEmpty() Rule {
 	return bytesPredicateRule(
 		func(value reflect.Value) bool { return value.Len() > 0 },

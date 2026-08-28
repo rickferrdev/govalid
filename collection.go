@@ -5,10 +5,12 @@ import (
 	"reflect"
 )
 
+// Collection requires a slice or array value.
 func Collection() Rule {
 	return collectionRule(func(reflect.Value) error { return nil })
 }
 
+// CollectionNotNil returns a collection validation rule for not nil.
 func CollectionNotNil() Rule {
 	return collectionRule(func(value reflect.Value) error {
 		if value.Kind() == reflect.Slice && value.IsNil() {
@@ -18,6 +20,7 @@ func CollectionNotNil() Rule {
 	})
 }
 
+// CollectionNil returns a collection validation rule for nil.
 func CollectionNil() Rule {
 	return collectionRule(func(value reflect.Value) error {
 		if value.Kind() != reflect.Slice || !value.IsNil() {
@@ -27,6 +30,7 @@ func CollectionNil() Rule {
 	})
 }
 
+// CollectionEmpty returns a collection validation rule for empty.
 func CollectionEmpty() Rule {
 	return collectionPredicateRule(
 		func(value reflect.Value) bool { return value.Len() == 0 },
@@ -34,6 +38,7 @@ func CollectionEmpty() Rule {
 	)
 }
 
+// CollectionNotEmpty returns a collection validation rule for not empty.
 func CollectionNotEmpty() Rule {
 	return collectionPredicateRule(
 		func(value reflect.Value) bool { return value.Len() > 0 },

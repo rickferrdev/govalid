@@ -6,24 +6,28 @@ import (
 	"reflect"
 )
 
+// BytesLength returns a byte-sequence validation rule for length.
 func BytesLength(expect int) Rule {
 	return bytesLengthRule(expect,
 		func(length int) bool { return length == expect },
 		fmt.Sprintf("should contain exactly %d bytes", expect))
 }
 
+// BytesMinLength returns a byte-sequence validation rule for min length.
 func BytesMinLength(expect int) Rule {
 	return bytesLengthRule(expect,
 		func(length int) bool { return length >= expect },
 		fmt.Sprintf("should contain at least %d bytes", expect))
 }
 
+// BytesMaxLength returns a byte-sequence validation rule for max length.
 func BytesMaxLength(expect int) Rule {
 	return bytesLengthRule(expect,
 		func(length int) bool { return length <= expect },
 		fmt.Sprintf("should contain at most %d bytes", expect))
 }
 
+// BytesLengthBetween returns a byte-sequence validation rule for length between.
 func BytesLengthBetween(minimum, maximum int) Rule {
 	return bytesRule(func(value reflect.Value) error {
 		if err := validateBytesLengthRange(minimum, maximum); err != nil {
@@ -36,6 +40,7 @@ func BytesLengthBetween(minimum, maximum int) Rule {
 	})
 }
 
+// BytesLengthNotBetween returns a byte-sequence validation rule for length not between.
 func BytesLengthNotBetween(minimum, maximum int) Rule {
 	return bytesRule(func(value reflect.Value) error {
 		if err := validateBytesLengthRange(minimum, maximum); err != nil {
