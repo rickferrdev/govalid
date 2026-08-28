@@ -19,7 +19,7 @@ func TestFloatComparisonsAndApproximation(t *testing.T) {
 		}
 	}
 
-	if err := runRule(1.0, FloatApprox(1.0, -1)); err == nil {
+	if err := runRule(1.0, FloatEqualWithin(1.0, -1)); err == nil {
 		t.Fatal("expected invalid tolerance error")
 	}
 }
