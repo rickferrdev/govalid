@@ -6,6 +6,7 @@ import (
 	"reflect"
 )
 
+// MapContainsValue returns a map validation rule for contains value.
 func MapContainsValue[V any](expected V) Rule {
 	return mapRule(func(value reflect.Value) error {
 		iterator := value.MapRange()
@@ -18,6 +19,7 @@ func MapContainsValue[V any](expected V) Rule {
 	})
 }
 
+// MapNotContainsValue returns a map validation rule for not contains value.
 func MapNotContainsValue[V any](unexpected V) Rule {
 	return mapRule(func(value reflect.Value) error {
 		iterator := value.MapRange()
@@ -30,6 +32,7 @@ func MapNotContainsValue[V any](unexpected V) Rule {
 	})
 }
 
+// MapContainsAnyValue returns a map validation rule for contains any value.
 func MapContainsAnyValue[V any](expected ...V) Rule {
 	return mapRule(func(value reflect.Value) error {
 		iterator := value.MapRange()
@@ -44,6 +47,7 @@ func MapContainsAnyValue[V any](expected ...V) Rule {
 	})
 }
 
+// MapContainsAllValues returns a map validation rule for contains all values.
 func MapContainsAllValues[V any](expected ...V) Rule {
 	return mapRule(func(value reflect.Value) error {
 		for _, expectedValue := range expected {
@@ -63,6 +67,7 @@ func MapContainsAllValues[V any](expected ...V) Rule {
 	})
 }
 
+// MapValues returns a map validation rule for values.
 func MapValues(rules ...Rule) Rule {
 	return func(context ruleContext) error {
 		value, err := mapValue(context)
@@ -86,14 +91,17 @@ func MapValues(rules ...Rule) Rule {
 	}
 }
 
+// MapValueAt returns a map validation rule for value at.
 func MapValueAt[K comparable](key K, rules ...Rule) Rule {
 	return mapValueAt(key, false, rules)
 }
 
+// MapValueAtIfPresent returns a map validation rule for value at if present.
 func MapValueAtIfPresent[K comparable](key K, rules ...Rule) Rule {
 	return mapValueAt(key, true, rules)
 }
 
+// MapNoNilValues returns a map validation rule for no nil values.
 func MapNoNilValues() Rule {
 	return mapRule(func(value reflect.Value) error {
 		iterator := value.MapRange()
@@ -106,6 +114,7 @@ func MapNoNilValues() Rule {
 	})
 }
 
+// MapNoZeroValues returns a map validation rule for no zero values.
 func MapNoZeroValues() Rule {
 	return mapRule(func(value reflect.Value) error {
 		iterator := value.MapRange()
@@ -119,6 +128,7 @@ func MapNoZeroValues() Rule {
 	})
 }
 
+// MapHasNonZeroValue returns a map validation rule for has non zero value.
 func MapHasNonZeroValue() Rule {
 	return mapRule(func(value reflect.Value) error {
 		iterator := value.MapRange()

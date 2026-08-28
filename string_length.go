@@ -5,6 +5,7 @@ import (
 	"unicode/utf8"
 )
 
+// StringLength returns a string validation rule for length.
 func StringLength(expect int) Rule {
 	return stringLengthRule(
 		func(length int) bool { return length == expect },
@@ -12,6 +13,7 @@ func StringLength(expect int) Rule {
 	)
 }
 
+// StringMinLength returns a string validation rule for min length.
 func StringMinLength(expect int) Rule {
 	return stringLengthRule(
 		func(length int) bool { return length >= expect },
@@ -19,6 +21,7 @@ func StringMinLength(expect int) Rule {
 	)
 }
 
+// StringMaxLength returns a string validation rule for max length.
 func StringMaxLength(expect int) Rule {
 	return stringLengthRule(
 		func(length int) bool { return length <= expect },

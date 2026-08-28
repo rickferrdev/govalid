@@ -73,6 +73,7 @@ func (n number) magnitude() uint64 {
 	return uint64(-(n.i64 + 1)) + 1
 }
 
+// String provides a public validation operation.
 func (n number) String() string {
 	if n.signed {
 		return strconv.FormatInt(n.i64, 10)

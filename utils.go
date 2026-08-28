@@ -6,11 +6,22 @@ import (
 	"strings"
 )
 
+type nilPathError struct {
+	path string
+}
+
+func (err *nilPathError) Error() string {
+	return fmt.Sprintf("field path %q crosses a nil value", err.path)
+}
+
 func lookup(root reflect.Value, path string) (reflect.Value, error) {
 	current := root
 
 	for part := range strings.SplitSeq(path, ".") {
 		current = indirect(current)
+		if isNilValue(current) {
+			return reflect.Value{}, &nilPathError{path: path}
+		}
 
 		if current.Kind() != reflect.Struct {
 			return reflect.Value{}, fmt.Errorf(

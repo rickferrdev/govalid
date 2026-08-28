@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// BytesEach returns a byte-sequence validation rule for each.
 func BytesEach(rules ...Rule) Rule {
 	return func(context ruleContext) error {
 		value, err := bytesValue(context)
@@ -23,10 +24,12 @@ func BytesEach(rules ...Rule) Rule {
 	}
 }
 
+// BytesAt returns a byte-sequence validation rule for at.
 func BytesAt(index int, rules ...Rule) Rule {
 	return bytesAt(index, false, rules)
 }
 
+// BytesAtIfPresent returns a byte-sequence validation rule for at if present.
 func BytesAtIfPresent(index int, rules ...Rule) Rule {
 	return bytesAt(index, true, rules)
 }

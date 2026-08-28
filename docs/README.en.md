@@ -1,40 +1,85 @@
-# govalid
+# govalid · English overview
 
-[Project home](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Complete API reference](API.md)
+[← Project home](../README.md) · [Português](README.pt-BR.md) · [API reference](API.md)
 
-`govalid` provides composable rules for validating selected Go struct fields
-without tags. The v0.2.0-alpha.1 scope includes booleans, strings, integers, floats,
-maps, collections, and byte sequences.
+> Explicit, composable validation for selected fields of Go structs.
 
-> This is a pre-v1 project. Public names and behavior may still change before
-> API stabilization.
-
-## Installation
+## Start here
 
 ```bash
-go get github.com/rickferrdev/govalid@v0.2.0-alpha.1
+go get github.com/rickferrdev/govalid@latest
 ```
-
-Use the module path without a version to install the current development
-revision.
-
-## Basic usage
 
 ```go
 validator := govalid.New()
 
 err := validator.Validate(
 	user,
-	govalid.Field("Name", govalid.StringRequired(), govalid.StringMinLength(3)),
+	govalid.Field("Name", govalid.Required(), govalid.StringMinLength(3)),
 	govalid.Field("Age", govalid.IntBetween(18, 130)),
-	govalid.Field("Active", govalid.BoolTrue()),
+	govalid.FieldIfPresent("Profile.Email", govalid.StringEmail()),
 	govalid.Field("Scores", govalid.CollectionEach(govalid.IntBetween(0, 100))),
 )
 ```
 
-Nested struct fields can be addressed with paths such as `"Profile.Email"`.
-By default, all rule failures are collected. Use
-`New(WithStopOnFirstError())` to stop at the first issue.
+The model is intentionally small:
+
+1. Create or reuse a `Validator`.
+2. Associate paths with rules through `Field` or `FieldIfPresent`.
+3. Inspect the returned structured issues.
+
+## What is included
+
+| Family | Coverage |
+| --- | --- |
+| Boolean | State and equality |
+| String | Unicode length, content, case, regex, email, URL, UUID |
+| Integer | Signed/unsigned comparison, sets, arithmetic, domain ranges |
+| Float | Comparison, tolerance, representation, special values |
+| Bytes | Binary content, encodings, document formats, per-byte rules |
+| Map | Keys, values, length, relationships, nested rules |
+| Collection | Content, length, uniqueness, comparison, nested item rules |
+| Universal | Presence, nil, and zero-value rules |
+| Conditional | Boolean conditions, context conditions, optional values |
+
+Defined types with supported underlying kinds are accepted. Integer
+comparisons preserve the complete `uint64` range when signed and unsigned
+values are mixed.
+
+## Composition patterns
+
+Validate every map key and value:
+
+```go
+govalid.Field(
+	"Labels",
+	govalid.MapKeys(govalid.StringLowercase()),
+	govalid.MapValues(govalid.StringRequired()),
+)
+```
+
+Skip nested rules when a value is absent:
+
+```go
+govalid.Field(
+	"Scores",
+	govalid.Optional(
+		govalid.CollectionEach(govalid.IntBetween(0, 100)),
+	),
+)
+```
+
+Apply rules based on the root struct:
+
+```go
+govalid.WhenContext(func(ctx govalid.RuleContext) bool {
+	return ctx.RootAny().(Account).Enabled
+}, govalid.StringRequired())
+```
+
+## Structured errors
+
+By default, all failures are returned in `*FieldIssueError`:
 
 ```go
 var validationErr *govalid.FieldIssueError
@@ -46,94 +91,36 @@ if errors.As(err, &validationErr) {
 }
 ```
 
-## Rule summary
+Each `Issue` exposes the field `Path`, rejected `Value`, `Rule`, and `Message`.
+Use `WithStopOnFirstError`, `WithPanicOnFirstError`, or `WithSilenceErrors` to
+change execution. `WithIssueHandler` observes failures independently of the
+selected return behavior.
 
-### Boolean
+## Extensibility
 
-`BoolTrue`, `BoolFalse`, and `BoolEqual` validate boolean state and equality.
+- Implement custom rules with `Rule` and `RuleContext`.
+- Use `FieldIfPresent` when a nested pointer or interface may be nil.
+- Implement `FieldSource` to discover `FieldSpec` values from another format.
+- Reuse a configured validator concurrently when callbacks and sources are
+  concurrency-safe.
 
-### String
+`FieldSource` is the compatibility boundary for future tag, schema, or
+generated integrations. No built-in tag syntax is part of the initial v1
+scope.
 
-String rules cover:
+## v1 scope
 
-- required values and Unicode-aware length;
-- alphabetic, numeric, alphanumeric, and ASCII content;
-- lowercase, uppercase, and trimmed text;
-- prefixes, suffixes, containment, and allowed sets;
-- regular expressions, email, absolute URL, and UUID formats.
+The initial stable API focuses on explicit rules for primitive values, maps,
+collections, bytes, nested paths, conditional composition, and structured
+errors. Dedicated recursive `Struct*` rules, time/duration families, and a
+built-in tag parser can evolve in later releases.
 
-Format-only rules accept an empty string. Combine them with `StringRequired`
-when the field is mandatory.
+Map iteration order is unspecified, so the first nested map failure may vary.
+Format-only string rules accept an empty value; combine them with `Required`
+or `StringRequired` when presence is mandatory.
 
-### Integer
+## Next links
 
-Integer rules accept all signed and unsigned integer variants, `uintptr`, and
-user-defined integer types. They cover:
-
-- comparison, equality, inclusive ranges, and sets;
-- positive, negative, and zero states;
-- parity, divisibility, primes, composite values, powers of two, and perfect
-  squares;
-- ports, percentages, and HTTP status ranges.
-
-Mixed signed/unsigned comparisons preserve the complete `uint64` range.
-
-### Float
-
-Float rules support `float32`, `float64`, and derived types. They cover:
-
-- comparison, equality, ranges, and tolerance;
-- sign and zero states;
-- 32-bit and 64-bit representation;
-- `NaN`, positive/negative infinity, and finiteness.
-
-### Map
-
-Map rules cover:
-
-- nil, empty, and length checks;
-- required, forbidden, allowed, and exact keys;
-- value containment and zero/nil values;
-- rules applied to every key, every value, or a selected key;
-- equality, subset, and superset relationships.
-
-```go
-govalid.Field(
-	"Labels",
-	govalid.MapNotEmpty(),
-	govalid.MapKeys(govalid.StringLowercase()),
-	govalid.MapValues(govalid.StringRequired()),
-)
-```
-
-### Collection
-
-Collection rules support slices and arrays. They cover:
-
-- nil, empty, and length checks;
-- item containment, uniqueness, zero, and nil values;
-- equality and inequality;
-- rules applied to every item, any item, no item, or a selected index.
-
-Arrays are never nil; only slices can satisfy `CollectionNil`.
-
-### Bytes
-
-Byte rules support byte slices, byte arrays, and user-defined byte types. They
-cover:
-
-- nil, empty, and length checks;
-- equality, constant-time equality, containment, prefixes, and suffixes;
-- lexicographical comparisons and ranges;
-- zero bytes, uniqueness, ASCII, printable ASCII, and UTF-8;
-- JSON, XML, PEM, hexadecimal, Base64, and Base64URL content;
-- rules applied to every byte or a selected index.
-
-## v0.2.0-alpha.1 limitations
-
-- No recursive `Struct*` rules yet; nested field paths are supported.
-- No dedicated rules for time, duration, pointers, or universal presence yet.
-- Map iteration order is unspecified, so the first nested map failure may vary.
-
-For every method signature and legacy alias, see the
-[complete API reference](API.md).
+- [Complete API reference](API.md)
+- [Root README and full example](../README.md)
+- [Package documentation](https://pkg.go.dev/github.com/rickferrdev/govalid)

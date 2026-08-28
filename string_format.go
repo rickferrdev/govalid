@@ -9,6 +9,7 @@ import (
 
 var uuidPattern = regexp.MustCompile(`(?i)^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`)
 
+// StringRegex returns a string validation rule for regex.
 func StringRegex(expression regexp.Regexp) Rule {
 	return stringPredicateRule(
 		expression.MatchString,
@@ -16,6 +17,7 @@ func StringRegex(expression regexp.Regexp) Rule {
 	)
 }
 
+// StringEmail returns a string validation rule for email.
 func StringEmail() Rule {
 	return func(context ruleContext) error {
 		value, err := stringValue(context)
@@ -34,6 +36,7 @@ func StringEmail() Rule {
 	}
 }
 
+// StringURL returns a string validation rule for url.
 func StringURL() Rule {
 	return func(context ruleContext) error {
 		value, err := stringValue(context)
@@ -52,6 +55,7 @@ func StringURL() Rule {
 	}
 }
 
+// StringUUID returns a string validation rule for uuid.
 func StringUUID() Rule {
 	return func(context ruleContext) error {
 		value, err := stringValue(context)

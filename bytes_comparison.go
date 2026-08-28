@@ -8,6 +8,7 @@ import (
 	"reflect"
 )
 
+// BytesEqual returns a byte-sequence validation rule for equal.
 func BytesEqual(expected []byte) Rule {
 	expected = bytes.Clone(expected)
 	return bytesSliceRule(func(value []byte) error {
@@ -18,6 +19,7 @@ func BytesEqual(expected []byte) Rule {
 	})
 }
 
+// BytesNotEqual returns a byte-sequence validation rule for not equal.
 func BytesNotEqual(unexpected []byte) Rule {
 	unexpected = bytes.Clone(unexpected)
 	return bytesSliceRule(func(value []byte) error {
@@ -28,6 +30,7 @@ func BytesNotEqual(unexpected []byte) Rule {
 	})
 }
 
+// BytesConstantTimeEqual returns a byte-sequence validation rule for constant time equal.
 func BytesConstantTimeEqual(expected []byte) Rule {
 	expected = bytes.Clone(expected)
 	return bytesSliceRule(func(value []byte) error {
@@ -38,6 +41,7 @@ func BytesConstantTimeEqual(expected []byte) Rule {
 	})
 }
 
+// BytesOneOf returns a byte-sequence validation rule for one of.
 func BytesOneOf(expected ...[]byte) Rule {
 	expected = cloneByteSlices(expected)
 	return bytesSliceRule(func(value []byte) error {
@@ -50,6 +54,7 @@ func BytesOneOf(expected ...[]byte) Rule {
 	})
 }
 
+// BytesNoneOf returns a byte-sequence validation rule for none of.
 func BytesNoneOf(unexpected ...[]byte) Rule {
 	unexpected = cloneByteSlices(unexpected)
 	return bytesSliceRule(func(value []byte) error {
@@ -62,6 +67,7 @@ func BytesNoneOf(unexpected ...[]byte) Rule {
 	})
 }
 
+// BytesContains returns a byte-sequence validation rule for contains.
 func BytesContains(expected []byte) Rule {
 	expected = bytes.Clone(expected)
 	return bytesSlicePredicateRule(
@@ -69,6 +75,7 @@ func BytesContains(expected []byte) Rule {
 		fmt.Sprintf("bytes should contain %v", expected))
 }
 
+// BytesNotContains returns a byte-sequence validation rule for not contains.
 func BytesNotContains(unexpected []byte) Rule {
 	unexpected = bytes.Clone(unexpected)
 	return bytesSlicePredicateRule(
@@ -76,6 +83,7 @@ func BytesNotContains(unexpected []byte) Rule {
 		fmt.Sprintf("bytes should not contain %v", unexpected))
 }
 
+// BytesContainsAny returns a byte-sequence validation rule for contains any.
 func BytesContainsAny(expected ...[]byte) Rule {
 	expected = cloneByteSlices(expected)
 	return bytesSliceRule(func(value []byte) error {
@@ -88,6 +96,7 @@ func BytesContainsAny(expected ...[]byte) Rule {
 	})
 }
 
+// BytesContainsAll returns a byte-sequence validation rule for contains all.
 func BytesContainsAll(expected ...[]byte) Rule {
 	expected = cloneByteSlices(expected)
 	return bytesSliceRule(func(value []byte) error {
@@ -100,6 +109,7 @@ func BytesContainsAll(expected ...[]byte) Rule {
 	})
 }
 
+// BytesHasPrefix returns a byte-sequence validation rule for has prefix.
 func BytesHasPrefix(prefix []byte) Rule {
 	prefix = bytes.Clone(prefix)
 	return bytesSlicePredicateRule(
@@ -107,6 +117,7 @@ func BytesHasPrefix(prefix []byte) Rule {
 		fmt.Sprintf("bytes should have prefix %v", prefix))
 }
 
+// BytesNotHasPrefix returns a byte-sequence validation rule for not has prefix.
 func BytesNotHasPrefix(prefix []byte) Rule {
 	prefix = bytes.Clone(prefix)
 	return bytesSlicePredicateRule(
@@ -114,6 +125,7 @@ func BytesNotHasPrefix(prefix []byte) Rule {
 		fmt.Sprintf("bytes should not have prefix %v", prefix))
 }
 
+// BytesHasSuffix returns a byte-sequence validation rule for has suffix.
 func BytesHasSuffix(suffix []byte) Rule {
 	suffix = bytes.Clone(suffix)
 	return bytesSlicePredicateRule(
@@ -121,6 +133,7 @@ func BytesHasSuffix(suffix []byte) Rule {
 		fmt.Sprintf("bytes should have suffix %v", suffix))
 }
 
+// BytesNotHasSuffix returns a byte-sequence validation rule for not has suffix.
 func BytesNotHasSuffix(suffix []byte) Rule {
 	suffix = bytes.Clone(suffix)
 	return bytesSlicePredicateRule(
@@ -128,22 +141,27 @@ func BytesNotHasSuffix(suffix []byte) Rule {
 		fmt.Sprintf("bytes should not have suffix %v", suffix))
 }
 
+// BytesGreaterThan returns a byte-sequence validation rule for greater than.
 func BytesGreaterThan(expected []byte) Rule {
 	return bytesOrderedRule(expected, func(order int) bool { return order > 0 }, "greater than")
 }
 
+// BytesGreaterThanOrEqual returns a byte-sequence validation rule for greater than or equal.
 func BytesGreaterThanOrEqual(expected []byte) Rule {
 	return bytesOrderedRule(expected, func(order int) bool { return order >= 0 }, "greater than or equal to")
 }
 
+// BytesLessThan returns a byte-sequence validation rule for less than.
 func BytesLessThan(expected []byte) Rule {
 	return bytesOrderedRule(expected, func(order int) bool { return order < 0 }, "less than")
 }
 
+// BytesLessThanOrEqual returns a byte-sequence validation rule for less than or equal.
 func BytesLessThanOrEqual(expected []byte) Rule {
 	return bytesOrderedRule(expected, func(order int) bool { return order <= 0 }, "less than or equal to")
 }
 
+// BytesBetween returns a byte-sequence validation rule for between.
 func BytesBetween(minimum, maximum []byte) Rule {
 	minimum = bytes.Clone(minimum)
 	maximum = bytes.Clone(maximum)

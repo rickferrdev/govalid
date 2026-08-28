@@ -6,6 +6,7 @@ import (
 	"reflect"
 )
 
+// BoolTrue returns a boolean validation rule for true.
 func BoolTrue() Rule {
 	return boolRule(func(b bool) error {
 		if !b {
@@ -16,6 +17,7 @@ func BoolTrue() Rule {
 	})
 }
 
+// BoolFalse returns a boolean validation rule for false.
 func BoolFalse() Rule {
 	return boolRule(func(b bool) error {
 		if b {
@@ -26,6 +28,7 @@ func BoolFalse() Rule {
 	})
 }
 
+// BoolEqual returns a boolean validation rule for equal.
 func BoolEqual(expect bool) Rule {
 	return boolRule(func(b bool) error {
 		if b != expect {

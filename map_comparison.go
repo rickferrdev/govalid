@@ -5,6 +5,7 @@ import (
 	"reflect"
 )
 
+// MapEqual returns a map validation rule for equal.
 func MapEqual[M ~map[K]V, K comparable, V any](expected M) Rule {
 	return mapRule(func(value reflect.Value) error {
 		if !reflect.DeepEqual(value.Interface(), expected) {
@@ -14,6 +15,7 @@ func MapEqual[M ~map[K]V, K comparable, V any](expected M) Rule {
 	})
 }
 
+// MapNotEqual returns a map validation rule for not equal.
 func MapNotEqual[M ~map[K]V, K comparable, V any](unexpected M) Rule {
 	return mapRule(func(value reflect.Value) error {
 		if reflect.DeepEqual(value.Interface(), unexpected) {
@@ -23,6 +25,7 @@ func MapNotEqual[M ~map[K]V, K comparable, V any](unexpected M) Rule {
 	})
 }
 
+// MapSubsetOf returns a map validation rule for subset of.
 func MapSubsetOf[M ~map[K]V, K comparable, V any](expected M) Rule {
 	return mapRule(func(value reflect.Value) error {
 		expectedValue := reflect.ValueOf(expected)
@@ -40,6 +43,7 @@ func MapSubsetOf[M ~map[K]V, K comparable, V any](expected M) Rule {
 	})
 }
 
+// MapSupersetOf returns a map validation rule for superset of.
 func MapSupersetOf[M ~map[K]V, K comparable, V any](expected M) Rule {
 	return mapRule(func(value reflect.Value) error {
 		expectedValue := reflect.ValueOf(expected)

@@ -1,19 +1,28 @@
-# govalid v0.1.0 API reference
+# govalid v1.0.0 API reference
 
 [Project home](../README.md) · [English guide](README.en.md) · [Guia em Português](README.pt-BR.md)
 
-This reference lists every exported type, function, and method in the current
-v0.1.0 API. Signatures use the internal constraints `integer` and `floating` as
+This reference lists every exported type, function, and method in the v1 API.
+Signatures use the internal constraints `integer` and `floating` as
 they appear in Go documentation; callers do not need to name those constraints.
 
 ## Core types
 
 ```go
-type Rule func(context ruleContext) error
+type RuleContext struct {
+	Root  reflect.Value
+	Path  string
+	Value reflect.Value
+}
+
+func (context RuleContext) RootAny() any
+func (context RuleContext) ValueAny() any
+
+type Rule func(context RuleContext) error
 ```
 
-A validation rule. The context is internal in v0.1.0, so consumers compose the
-rules provided by this package.
+Consumers can implement custom rules directly. `RootAny` and `ValueAny`
+provide safe interface values when direct reflection is unnecessary.
 
 ```go
 type FieldSpec struct {
@@ -25,13 +34,30 @@ type FieldSpec struct {
 Associates a struct field path with rules.
 
 ```go
+type FieldSource interface {
+	Fields(structType reflect.Type) ([]FieldSpec, error)
+}
+
+type FieldSourceFunc func(structType reflect.Type) ([]FieldSpec, error)
+
+func (source FieldSourceFunc) Fields(structType reflect.Type) ([]FieldSpec, error)
+```
+
+Field sources extend field discovery without changing validation execution.
+They can support future tag, schema, or generated declarations. Sources run
+before explicit fields and must be concurrency-safe when the validator is
+shared.
+
+```go
 type Issue struct {
 	Path    string
+	Value   any
+	Rule    string
 	Message string
 }
 ```
 
-Represents one failed rule.
+Represents one failed rule and implements `error`.
 
 ```go
 type FieldIssueError struct {
@@ -48,44 +74,84 @@ type Option func(opts *options)
 Configures a validator. The internal `options` type is intentionally hidden.
 
 ```go
-type Structurer struct {
+type Validator struct {
 	// contains filtered or unexported fields
 }
+
 ```
 
-The validator returned by `New`.
+`Validator` is the validator returned by `New`.
 
 ## Core functions and methods
 
 ```go
-func New(options ...Option) *Structurer
+func New(options ...Option) *Validator
 ```
 
 Creates a validator.
 
 ```go
 func Field(path string, rules ...Rule) FieldSpec
+func FieldIfPresent(path string, rules ...Rule) FieldSpec
 ```
 
 Builds a field specification. Dot-separated paths address nested struct fields.
+`Field` treats a nil intermediate path as an error; `FieldIfPresent` skips the
+field when an intermediate pointer or interface is nil.
 
 ```go
-func (sttr *Structurer) Validate(data any, fields ...FieldSpec) error
+func (validator *Validator) Validate(data any, fields ...FieldSpec) error
 ```
 
 Validates selected fields from a struct or pointer to a struct.
 
 ```go
-func (issue *FieldIssueError) Error() string
+func (issue *Issue) Error() string
+func (field *FieldIssueError) Error() string
+func (field *FieldIssueError) As(target any) bool
 ```
 
-Implements `error`.
+Both issue types implement `error`. In addition to extracting the complete
+`*FieldIssueError`, `errors.As` can extract its first `*Issue` directly.
 
 ```go
 func WithStopOnFirstError() Option
+func WithPanicOnFirstError() Option
+func WithSilenceErrors() Option
+func WithIssueHandler(handler func(Issue)) Option
+func WithFieldSources(sources ...FieldSource) Option
 ```
 
-Stops validation after the first rule failure.
+These options stop after the first failure, panic with `*Issue`, or run all
+rules while suppressing the returned validation error, respectively. The issue
+handler runs for every failed rule before stop, panic, or silence behavior is
+applied. Concurrent callers must provide a concurrency-safe handler.
+
+## Universal and conditional rules
+
+```go
+func Required() Rule
+func Nil() Rule
+func NotNil() Rule
+func Zero() Rule
+func NotZero() Rule
+```
+
+`Required` rejects nil and empty strings, arrays, slices, and maps. Scalar zero
+values such as `0` and `false` remain present; use `NotZero` to reject them.
+
+```go
+type Condition func(context RuleContext) bool
+
+func When(condition bool, rules ...Rule) Rule
+func Unless(condition bool, rules ...Rule) Rule
+func WhenContext(condition Condition, rules ...Rule) Rule
+func UnlessContext(condition Condition, rules ...Rule) Rule
+func Optional(rules ...Rule) Rule
+```
+
+`Optional` skips nested rules for nil and empty values. Context conditions can
+inspect both the selected value and the validated root struct.
 
 ## Boolean rules
 
@@ -222,16 +288,6 @@ func IntHTTPStatus() Rule
 
 The accepted inclusive ranges are respectively 1–65535, 0–100, and 100–599.
 
-### Legacy integer aliases
-
-```go
-func IntNoneof[T integer](restricted ...T) Rule
-func IsPerfectSquare() Rule
-```
-
-Prefer `IntNoneOf` and `IntPerfectSquare`. Legacy aliases may be removed before
-v1.0.0.
-
 ## Float rules
 
 The `floating` constraint accepts `float32`, `float64`, and user-defined types
@@ -255,12 +311,10 @@ func FloatNotEqual[T floating](expect T) Rule
 ```go
 func FloatBetween[Min floating, Max floating](minimum Min, maximum Max) Rule
 func FloatNotBetween[Min floating, Max floating](minimum Min, maximum Max) Rule
-func FloatApprox[T floating](expect T, tolerance float64) Rule
 func FloatEqualWithin[T floating](expect T, tolerance float64) Rule
 ```
 
-`FloatEqualWithin` is the preferred descriptive name for tolerance-based
-comparison. `FloatApprox` provides the same behavior.
+`FloatEqualWithin` performs tolerance-based comparison.
 
 ### Sign
 
@@ -466,17 +520,6 @@ func MapSupersetOf[M ~map[K]V, K comparable, V any](expected M) Rule
 
 Subset and superset compare entries, including values.
 
-### Legacy map aliases
-
-```go
-func MapIsMap() Rule
-func MapHasAllKey[K comparable](expected ...K) Rule
-func MapHasAnyAllKey[K comparable](expected ...K) Rule
-func MapHasNoneAllKey[K comparable](unexpected ...K) Rule
-```
-
-Prefer `Map`, `MapHasAllKeys`, `MapHasAnyKey`, and `MapHasNoneOfKeys`.
-
 ## Collection rules
 
 Collection rules accept slices and arrays.
@@ -520,15 +563,13 @@ func CollectionHasNonZeroItem() Rule
 
 ```go
 func CollectionEach(rules ...Rule) Rule
-func CollectionAll(rules ...Rule) Rule
 func CollectionAny(rules ...Rule) Rule
 func CollectionNone(rules ...Rule) Rule
 func CollectionItemAt(index int, rules ...Rule) Rule
 func CollectionItemAtIfPresent(index int, rules ...Rule) Rule
 ```
 
-`CollectionAll` is an alias for `CollectionEach`. Every item must satisfy every
-provided rule.
+Every item selected by `CollectionEach` must satisfy every provided rule.
 
 ### Comparison
 
@@ -539,5 +580,5 @@ func CollectionNotEqual[T any](unexpected T) Rule
 
 ## API stability
 
-This reference describes the pre-v1 v0.1.0 surface. Canonical names should be
-preferred over legacy aliases. Breaking cleanup remains possible until v1.0.0.
+This reference describes the v1 public surface. Future v1 releases should
+preserve these names and contracts under semantic versioning.

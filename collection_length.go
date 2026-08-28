@@ -6,24 +6,28 @@ import (
 	"reflect"
 )
 
+// CollectionLength returns a collection validation rule for length.
 func CollectionLength(expect int) Rule {
 	return collectionLengthRule(expect,
 		func(length int) bool { return length == expect },
 		fmt.Sprintf("should have exactly %d items", expect))
 }
 
+// CollectionMinLength returns a collection validation rule for min length.
 func CollectionMinLength(expect int) Rule {
 	return collectionLengthRule(expect,
 		func(length int) bool { return length >= expect },
 		fmt.Sprintf("should have at least %d items", expect))
 }
 
+// CollectionMaxLength returns a collection validation rule for max length.
 func CollectionMaxLength(expect int) Rule {
 	return collectionLengthRule(expect,
 		func(length int) bool { return length <= expect },
 		fmt.Sprintf("should have at most %d items", expect))
 }
 
+// CollectionLengthBetween returns a collection validation rule for length between.
 func CollectionLengthBetween(minimum, maximum int) Rule {
 	return collectionRule(func(value reflect.Value) error {
 		if minimum < 0 || maximum < 0 {
@@ -39,6 +43,7 @@ func CollectionLengthBetween(minimum, maximum int) Rule {
 	})
 }
 
+// CollectionLengthNotBetween returns a collection validation rule for length not between.
 func CollectionLengthNotBetween(minimum, maximum int) Rule {
 	return collectionRule(func(value reflect.Value) error {
 		if minimum < 0 || maximum < 0 {

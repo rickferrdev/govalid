@@ -5,6 +5,7 @@ import (
 	"reflect"
 )
 
+// CollectionEqual returns a collection validation rule for equal.
 func CollectionEqual[T any](expected T) Rule {
 	return collectionRule(func(value reflect.Value) error {
 		if !reflect.DeepEqual(value.Interface(), expected) {
@@ -14,6 +15,7 @@ func CollectionEqual[T any](expected T) Rule {
 	})
 }
 
+// CollectionNotEqual returns a collection validation rule for not equal.
 func CollectionNotEqual[T any](unexpected T) Rule {
 	return collectionRule(func(value reflect.Value) error {
 		if reflect.DeepEqual(value.Interface(), unexpected) {

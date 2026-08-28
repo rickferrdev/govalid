@@ -5,6 +5,7 @@ import (
 	"math"
 )
 
+// FloatBits returns a floating-point validation rule for bits.
 func FloatBits(bits int) Rule {
 	return floatPredicateRule(
 		func(value floatNumber) bool { return value.bits == bits },
@@ -12,9 +13,13 @@ func FloatBits(bits int) Rule {
 	)
 }
 
+// FloatIs32 returns a floating-point validation rule for is32.
 func FloatIs32() Rule { return FloatBits(32) }
+
+// FloatIs64 returns a floating-point validation rule for is64.
 func FloatIs64() Rule { return FloatBits(64) }
 
+// FloatNaN returns a floating-point validation rule for na n.
 func FloatNaN() Rule {
 	return floatPredicateRule(
 		func(value floatNumber) bool { return math.IsNaN(value.value) },
@@ -22,6 +27,7 @@ func FloatNaN() Rule {
 	)
 }
 
+// FloatNotNaN returns a floating-point validation rule for not na n.
 func FloatNotNaN() Rule {
 	return floatPredicateRule(
 		func(value floatNumber) bool { return !math.IsNaN(value.value) },
@@ -29,6 +35,7 @@ func FloatNotNaN() Rule {
 	)
 }
 
+// FloatInfinite returns a floating-point validation rule for infinite.
 func FloatInfinite() Rule {
 	return floatPredicateRule(
 		func(value floatNumber) bool { return math.IsInf(value.value, 0) },
@@ -36,6 +43,7 @@ func FloatInfinite() Rule {
 	)
 }
 
+// FloatPositiveInfinite returns a floating-point validation rule for positive infinite.
 func FloatPositiveInfinite() Rule {
 	return floatPredicateRule(
 		func(value floatNumber) bool { return math.IsInf(value.value, 1) },
@@ -43,6 +51,7 @@ func FloatPositiveInfinite() Rule {
 	)
 }
 
+// FloatNegativeInfinite returns a floating-point validation rule for negative infinite.
 func FloatNegativeInfinite() Rule {
 	return floatPredicateRule(
 		func(value floatNumber) bool { return math.IsInf(value.value, -1) },
@@ -50,6 +59,7 @@ func FloatNegativeInfinite() Rule {
 	)
 }
 
+// FloatNotInfinite returns a floating-point validation rule for not infinite.
 func FloatNotInfinite() Rule {
 	return floatPredicateRule(
 		func(value floatNumber) bool { return !math.IsInf(value.value, 0) },
@@ -57,6 +67,7 @@ func FloatNotInfinite() Rule {
 	)
 }
 
+// FloatFinite returns a floating-point validation rule for finite.
 func FloatFinite() Rule {
 	return floatPredicateRule(
 		func(value floatNumber) bool {
@@ -66,6 +77,7 @@ func FloatFinite() Rule {
 	)
 }
 
+// FloatNotFinite returns a floating-point validation rule for not finite.
 func FloatNotFinite() Rule {
 	return floatPredicateRule(
 		func(value floatNumber) bool {

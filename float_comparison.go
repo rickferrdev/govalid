@@ -6,6 +6,7 @@ import (
 	"math"
 )
 
+// FloatGreaterThan returns a floating-point validation rule for greater than.
 func FloatGreaterThan[T floating](expect T) Rule {
 	expected := float64(expect)
 	return floatPredicateRule(
@@ -14,6 +15,7 @@ func FloatGreaterThan[T floating](expect T) Rule {
 	)
 }
 
+// FloatGreaterThanOrEqual returns a floating-point validation rule for greater than or equal.
 func FloatGreaterThanOrEqual[T floating](expect T) Rule {
 	expected := float64(expect)
 	return floatPredicateRule(
@@ -22,8 +24,10 @@ func FloatGreaterThanOrEqual[T floating](expect T) Rule {
 	)
 }
 
+// FloatMin returns a floating-point validation rule for min.
 func FloatMin[T floating](expect T) Rule { return FloatGreaterThanOrEqual(expect) }
 
+// FloatLessThan returns a floating-point validation rule for less than.
 func FloatLessThan[T floating](expect T) Rule {
 	expected := float64(expect)
 	return floatPredicateRule(
@@ -32,6 +36,7 @@ func FloatLessThan[T floating](expect T) Rule {
 	)
 }
 
+// FloatLessThanOrEqual returns a floating-point validation rule for less than or equal.
 func FloatLessThanOrEqual[T floating](expect T) Rule {
 	expected := float64(expect)
 	return floatPredicateRule(
@@ -40,8 +45,10 @@ func FloatLessThanOrEqual[T floating](expect T) Rule {
 	)
 }
 
+// FloatMax returns a floating-point validation rule for max.
 func FloatMax[T floating](expect T) Rule { return FloatLessThanOrEqual(expect) }
 
+// FloatBetween returns a floating-point validation rule for between.
 func FloatBetween[Min floating, Max floating](minimum Min, maximum Max) Rule {
 	minimumValue := float64(minimum)
 	maximumValue := float64(maximum)
@@ -60,6 +67,7 @@ func FloatBetween[Min floating, Max floating](minimum Min, maximum Max) Rule {
 	})
 }
 
+// FloatNotBetween returns a floating-point validation rule for not between.
 func FloatNotBetween[Min floating, Max floating](minimum Min, maximum Max) Rule {
 	minimumValue := float64(minimum)
 	maximumValue := float64(maximum)
@@ -78,6 +86,7 @@ func FloatNotBetween[Min floating, Max floating](minimum Min, maximum Max) Rule 
 	})
 }
 
+// FloatEqual returns a floating-point validation rule for equal.
 func FloatEqual[T floating](expect T) Rule {
 	expected := float64(expect)
 	return floatPredicateRule(
@@ -86,6 +95,7 @@ func FloatEqual[T floating](expect T) Rule {
 	)
 }
 
+// FloatNotEqual returns a floating-point validation rule for not equal.
 func FloatNotEqual[T floating](expect T) Rule {
 	expected := float64(expect)
 	return floatPredicateRule(
@@ -94,14 +104,26 @@ func FloatNotEqual[T floating](expect T) Rule {
 	)
 }
 
-func FloatPositive() Rule    { return FloatGreaterThan(0.0) }
-func FloatNegative() Rule    { return FloatLessThan(0.0) }
-func FloatNonPositive() Rule { return FloatLessThanOrEqual(0.0) }
-func FloatNonNegative() Rule { return FloatGreaterThanOrEqual(0.0) }
-func FloatZero() Rule        { return FloatEqual(0.0) }
-func FloatNonZero() Rule     { return FloatNotEqual(0.0) }
+// FloatPositive returns a floating-point validation rule for positive.
+func FloatPositive() Rule { return FloatGreaterThan(0.0) }
 
-func FloatApprox[T floating](expect T, tolerance float64) Rule {
+// FloatNegative returns a floating-point validation rule for negative.
+func FloatNegative() Rule { return FloatLessThan(0.0) }
+
+// FloatNonPositive returns a floating-point validation rule for non positive.
+func FloatNonPositive() Rule { return FloatLessThanOrEqual(0.0) }
+
+// FloatNonNegative returns a floating-point validation rule for non negative.
+func FloatNonNegative() Rule { return FloatGreaterThanOrEqual(0.0) }
+
+// FloatZero returns a floating-point validation rule for zero.
+func FloatZero() Rule { return FloatEqual(0.0) }
+
+// FloatNonZero returns a floating-point validation rule for non zero.
+func FloatNonZero() Rule { return FloatNotEqual(0.0) }
+
+// FloatEqualWithin returns a floating-point validation rule for equal within.
+func FloatEqualWithin[T floating](expect T, tolerance float64) Rule {
 	expected := float64(expect)
 
 	return floatRule(func(value floatNumber) error {
@@ -120,8 +142,4 @@ func FloatApprox[T floating](expect T, tolerance float64) Rule {
 		}
 		return nil
 	})
-}
-
-func FloatEqualWithin[T floating](expect T, tolerance float64) Rule {
-	return FloatApprox(expect, tolerance)
 }
