@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// IntEven returns an integer validation rule for even.
 func IntEven() Rule {
 	return integerRule(func(value number) error {
 		if value.magnitude()%2 != 0 {
@@ -14,6 +15,7 @@ func IntEven() Rule {
 	})
 }
 
+// IntOdd returns an integer validation rule for odd.
 func IntOdd() Rule {
 	return integerRule(func(value number) error {
 		if value.magnitude()%2 == 0 {
@@ -23,14 +25,17 @@ func IntOdd() Rule {
 	})
 }
 
+// IntMultipleOf returns an integer validation rule for multiple of.
 func IntMultipleOf[T integer](n T) Rule {
 	return divisibleIntegerRule(numberFrom(n), "should be a multiple of")
 }
 
+// IntDivisibleBy returns an integer validation rule for divisible by.
 func IntDivisibleBy[T integer](n T) Rule {
 	return divisibleIntegerRule(numberFrom(n), "should be divisible by")
 }
 
+// IntPrime returns an integer validation rule for prime.
 func IntPrime() Rule {
 	return integerRule(func(value number) error {
 		if value.isNegative() || !isPrime(value.magnitude()) {
@@ -40,6 +45,7 @@ func IntPrime() Rule {
 	})
 }
 
+// IntCompound returns an integer validation rule for compound.
 func IntCompound() Rule {
 	return integerRule(func(value number) error {
 		if value.isNegative() || value.magnitude() < 4 || isPrime(value.magnitude()) {
@@ -49,6 +55,7 @@ func IntCompound() Rule {
 	})
 }
 
+// IntPowerOfTwo returns an integer validation rule for power of two.
 func IntPowerOfTwo() Rule {
 	return integerRule(func(value number) error {
 		magnitude := value.magnitude()
@@ -59,6 +66,7 @@ func IntPowerOfTwo() Rule {
 	})
 }
 
+// IntPerfectSquare returns an integer validation rule for perfect square.
 func IntPerfectSquare() Rule {
 	return integerRule(func(value number) error {
 		if value.isNegative() || !isPerfectSquare(value.magnitude()) {
@@ -67,9 +75,6 @@ func IntPerfectSquare() Rule {
 		return nil
 	})
 }
-
-// IsPerfectSquare is kept for backward compatibility. Use IntPerfectSquare instead.
-func IsPerfectSquare() Rule { return IntPerfectSquare() }
 
 func divisibleIntegerRule(divisor number, message string) Rule {
 	return integerRule(func(value number) error {

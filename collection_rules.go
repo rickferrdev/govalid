@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// CollectionEach returns a collection validation rule for each.
 func CollectionEach(rules ...Rule) Rule {
 	return func(context ruleContext) error {
 		value, err := collectionValue(context)
@@ -21,9 +22,7 @@ func CollectionEach(rules ...Rule) Rule {
 	}
 }
 
-// CollectionAll is an alias for CollectionEach.
-func CollectionAll(rules ...Rule) Rule { return CollectionEach(rules...) }
-
+// CollectionAny returns a collection validation rule for any.
 func CollectionAny(rules ...Rule) Rule {
 	return func(context ruleContext) error {
 		value, err := collectionValue(context)
@@ -39,6 +38,7 @@ func CollectionAny(rules ...Rule) Rule {
 	}
 }
 
+// CollectionNone returns a collection validation rule for none.
 func CollectionNone(rules ...Rule) Rule {
 	return func(context ruleContext) error {
 		value, err := collectionValue(context)
@@ -54,10 +54,12 @@ func CollectionNone(rules ...Rule) Rule {
 	}
 }
 
+// CollectionItemAt returns a collection validation rule for item at.
 func CollectionItemAt(index int, rules ...Rule) Rule {
 	return collectionItemAt(index, false, rules)
 }
 
+// CollectionItemAtIfPresent returns a collection validation rule for item at if present.
 func CollectionItemAtIfPresent(index int, rules ...Rule) Rule {
 	return collectionItemAt(index, true, rules)
 }

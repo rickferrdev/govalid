@@ -5,6 +5,7 @@ import (
 	"reflect"
 )
 
+// MapHasKey returns a map validation rule for has key.
 func MapHasKey[K comparable](expected K) Rule {
 	return mapRule(func(value reflect.Value) error {
 		key, err := mapKeyValue(value, expected)
@@ -18,6 +19,7 @@ func MapHasKey[K comparable](expected K) Rule {
 	})
 }
 
+// MapNotHasKey returns a map validation rule for not has key.
 func MapNotHasKey[K comparable](unexpected K) Rule {
 	return mapRule(func(value reflect.Value) error {
 		key, err := mapKeyValue(value, unexpected)
@@ -31,6 +33,7 @@ func MapNotHasKey[K comparable](unexpected K) Rule {
 	})
 }
 
+// MapHasAllKeys returns a map validation rule for has all keys.
 func MapHasAllKeys[K comparable](expected ...K) Rule {
 	return mapRule(func(value reflect.Value) error {
 		for _, expectedKey := range expected {
@@ -46,6 +49,7 @@ func MapHasAllKeys[K comparable](expected ...K) Rule {
 	})
 }
 
+// MapHasAnyKey returns a map validation rule for has any key.
 func MapHasAnyKey[K comparable](expected ...K) Rule {
 	return mapRule(func(value reflect.Value) error {
 		for _, expectedKey := range expected {
@@ -61,6 +65,7 @@ func MapHasAnyKey[K comparable](expected ...K) Rule {
 	})
 }
 
+// MapHasNoneOfKeys returns a map validation rule for has none of keys.
 func MapHasNoneOfKeys[K comparable](unexpected ...K) Rule {
 	return mapRule(func(value reflect.Value) error {
 		for _, unexpectedKey := range unexpected {
@@ -76,6 +81,7 @@ func MapHasNoneOfKeys[K comparable](unexpected ...K) Rule {
 	})
 }
 
+// MapAllowedKeys returns a map validation rule for allowed keys.
 func MapAllowedKeys[K comparable](allowed ...K) Rule {
 	return mapRule(func(value reflect.Value) error {
 		allowedKeys, err := mapKeyValues(value, allowed)
@@ -92,6 +98,7 @@ func MapAllowedKeys[K comparable](allowed ...K) Rule {
 	})
 }
 
+// MapHasExactKeys returns a map validation rule for has exact keys.
 func MapHasExactKeys[K comparable](expected ...K) Rule {
 	return mapRule(func(value reflect.Value) error {
 		expectedKeys, err := mapKeyValues(value, expected)
@@ -110,13 +117,7 @@ func MapHasExactKeys[K comparable](expected ...K) Rule {
 	})
 }
 
-// Compatibility aliases for the previous API.
-func MapHasAllKey[K comparable](expected ...K) Rule    { return MapHasAllKeys(expected...) }
-func MapHasAnyAllKey[K comparable](expected ...K) Rule { return MapHasAnyKey(expected...) }
-func MapHasNoneAllKey[K comparable](unexpected ...K) Rule {
-	return MapHasNoneOfKeys(unexpected...)
-}
-
+// MapKeys returns a map validation rule for keys.
 func MapKeys(rules ...Rule) Rule {
 	return func(context ruleContext) error {
 		value, err := mapValue(context)

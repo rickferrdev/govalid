@@ -5,11 +5,10 @@ import (
 	"reflect"
 )
 
+// Map requires a map value.
 func Map() Rule { return mapRule(func(reflect.Value) error { return nil }) }
 
-// MapIsMap is kept for backward compatibility. Use Map instead.
-func MapIsMap() Rule { return Map() }
-
+// MapNotNil returns a map validation rule for not nil.
 func MapNotNil() Rule {
 	return mapRule(func(value reflect.Value) error {
 		if value.IsNil() {
@@ -19,6 +18,7 @@ func MapNotNil() Rule {
 	})
 }
 
+// MapNil returns a map validation rule for nil.
 func MapNil() Rule {
 	return mapRule(func(value reflect.Value) error {
 		if !value.IsNil() {
@@ -28,6 +28,7 @@ func MapNil() Rule {
 	})
 }
 
+// MapEmpty returns a map validation rule for empty.
 func MapEmpty() Rule {
 	return mapRule(func(value reflect.Value) error {
 		if value.Len() != 0 {
@@ -37,6 +38,7 @@ func MapEmpty() Rule {
 	})
 }
 
+// MapNotEmpty returns a map validation rule for not empty.
 func MapNotEmpty() Rule {
 	return mapRule(func(value reflect.Value) error {
 		if value.Len() == 0 {

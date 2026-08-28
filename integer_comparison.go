@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// IntMin returns an integer validation rule for min.
 func IntMin[T integer](expect T) Rule {
 	expected := numberFrom(expect)
 	return integerPredicateRule(
@@ -13,6 +14,7 @@ func IntMin[T integer](expect T) Rule {
 	)
 }
 
+// IntMax returns an integer validation rule for max.
 func IntMax[T integer](expect T) Rule {
 	expected := numberFrom(expect)
 	return integerPredicateRule(
@@ -21,9 +23,13 @@ func IntMax[T integer](expect T) Rule {
 	)
 }
 
+// IntGreaterThanOrEqual returns an integer validation rule for greater than or equal.
 func IntGreaterThanOrEqual[T integer](expect T) Rule { return IntMin(expect) }
-func IntLessThanOrEqual[T integer](expect T) Rule    { return IntMax(expect) }
 
+// IntLessThanOrEqual returns an integer validation rule for less than or equal.
+func IntLessThanOrEqual[T integer](expect T) Rule { return IntMax(expect) }
+
+// IntBetween returns an integer validation rule for between.
 func IntBetween[Min integer, Max integer](minimum Min, maximum Max) Rule {
 	minimumNumber := numberFrom(minimum)
 	maximumNumber := numberFrom(maximum)
@@ -39,6 +45,7 @@ func IntBetween[Min integer, Max integer](minimum Min, maximum Max) Rule {
 	})
 }
 
+// IntNotBetween returns an integer validation rule for not between.
 func IntNotBetween[Min integer, Max integer](minimum Min, maximum Max) Rule {
 	minimumNumber := numberFrom(minimum)
 	maximumNumber := numberFrom(maximum)
@@ -54,6 +61,7 @@ func IntNotBetween[Min integer, Max integer](minimum Min, maximum Max) Rule {
 	})
 }
 
+// IntOneOf returns an integer validation rule for one of.
 func IntOneOf[T integer](allowed ...T) Rule {
 	allowedNumbers := make([]number, len(allowed))
 	for index, value := range allowed {
@@ -70,6 +78,7 @@ func IntOneOf[T integer](allowed ...T) Rule {
 	})
 }
 
+// IntNoneOf returns an integer validation rule for none of.
 func IntNoneOf[T integer](restricted ...T) Rule {
 	restrictedNumbers := make([]number, len(restricted))
 	for index, value := range restricted {
@@ -86,9 +95,7 @@ func IntNoneOf[T integer](restricted ...T) Rule {
 	})
 }
 
-// IntNoneof is kept for backward compatibility. Use IntNoneOf instead.
-func IntNoneof[T integer](restricted ...T) Rule { return IntNoneOf(restricted...) }
-
+// IntGreaterThan returns an integer validation rule for greater than.
 func IntGreaterThan[T integer](expect T) Rule {
 	expected := numberFrom(expect)
 	return integerPredicateRule(
@@ -97,6 +104,7 @@ func IntGreaterThan[T integer](expect T) Rule {
 	)
 }
 
+// IntLessThan returns an integer validation rule for less than.
 func IntLessThan[T integer](expect T) Rule {
 	expected := numberFrom(expect)
 	return integerPredicateRule(
@@ -105,6 +113,7 @@ func IntLessThan[T integer](expect T) Rule {
 	)
 }
 
+// IntEqual returns an integer validation rule for equal.
 func IntEqual[T integer](expect T) Rule {
 	expected := numberFrom(expect)
 	return integerPredicateRule(
@@ -113,6 +122,7 @@ func IntEqual[T integer](expect T) Rule {
 	)
 }
 
+// IntNotEqual returns an integer validation rule for not equal.
 func IntNotEqual[T integer](expect T) Rule {
 	expected := numberFrom(expect)
 	return integerPredicateRule(
